@@ -1,0 +1,36 @@
+qtLibPathFacade
+
+Copyright 2014 Lloyd Konneker
+
+This is free software, covered by the GNU General Public License v3.
+
+This class has a class method that wraps Qt library path methods.
+It makes a PyQt app start properly when bundled and sandboxed on OSX.
+It lets Qt finds its own platform abstraction plugin libqcocoa.dylib
+in the app's bundle, i.e. beneath foo.app/Contents/PlugIns.
+Qt's default library path is insufficient in this case.
+
+You don't need this:
+- if you statically compile libqcocoa and link it into your app
+- if you don't sandbox, and thus can use a shared Qt installation
+   (when Qt's default library path will find the plugin.)
+
+Symptoms of its absence:
+-'failed to load platform plugin libqcocoa' printed by Qt on the console when you run your app in a terminal
+- a crash report with 
+    QMessageLogger::fatal(char const*, ...)
+    QGuiApplicationPrivate::createPlatformIntegration()
+  when you double click your app
+
+Typical use:
+  
+  from qtLibPathFacade.qtLibPathFacade import QtLibPathFacade
+  
+  def main(args):
+      QtLibPathFacade.addBundledPluginPath()
+      app = QApplication(args)
+
+More details are in the code.
+
+From a suggestion by Kevin Knowles in Qt forums.
+
